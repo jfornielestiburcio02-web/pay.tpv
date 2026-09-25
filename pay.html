@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TPV MCRP</title>
+    <title>Pasarela de Pago - Madrid City Roleplay</title>
     <style>
         * {
             margin: 0;
@@ -16,24 +15,83 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #000; 
+            background-color: #0b0f19;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         iframe {
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             border: none;
             display: block;
+        }
+
+        /* Pantalla de error si no se especifica ID */
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-card {
+            background: rgba(18, 24, 38, 0.95);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 16px;
+            padding: 40px 30px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .error-card h1 {
+            font-size: 22px;
+            color: #f87171;
+            margin-bottom: 12px;
+        }
+
+        .error-card p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-    <iframe 
-        src="https://madridcityroleplay.site/pasareladepagos/api/getdataUsp.php" 
-        title="X Pantalla Completa"
-        allow="fullscreen">
-    </iframe>
+    <!-- iFrame a pantalla completa -->
+    <iframe id="payIframe" allow="payment"></iframe>
 
+    <!-- Mensaje de error (oculto por defecto) -->
+    <div id="errorBox" class="error-container" style="display: none;">
+        <div class="error-card">
+            <h1>⚠️ Enlace de pago no válido</h1>
+            <p>No se ha especificado ningún identificador de pago en la dirección URL.</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Obtener los parámetros de la URL actual
+        const urlParams = new URLSearchParams(window.location.search);
+        const enlaceId = urlParams.get('id');
+
+        // 2. Ruta base del PHP procesador de pagos en tu servidor principal
+        // (Ajusta la ruta si tu archivo PHP final tiene otro nombre)
+        const phpEndpoint = "https://madridcityroleplay.site/pasareladepagos/api/procesarPago.php";
+
+        // 3. Validar y asignar la URL al iFrame
+        if (enlaceId && enlaceId.trim() !== "") {
+            const finalUrl = phpEndpoint + "?id=" + encodeURIComponent(enlaceId);
+            document.getElementById('payIframe').src = finalUrl;
+        } else {
+            // Ocultar iframe y mostrar mensaje de error si no hay ID
+            document.getElementById('payIframe').style.display = 'none';
+            document.getElementById('errorBox').style.display = 'flex';
+        }
+    </script>
 </body>
 </html>
